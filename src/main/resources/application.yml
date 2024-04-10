@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: dev
+
+info:
+  application:
+    name: springboot-api-rest-greisyGu-bussiness
+    description: API REST from Maxikiosco GreisiGu
+    author: Alex Lopez
+    version: '@project.version@'
