@@ -8,3 +8,7 @@ info:
     description: API REST from Maxikiosco GreisiGu
     author: Alex Lopez
     version: '@project.version@'
+
+springdoc:
+  swagger-ui:
+    path: /
