@@ -15,11 +15,15 @@ public class Product {
     @Id
     private Long id;
 
-    private String name;
+    private String urlImg;
 
     private String description;
 
     private Double price;
+
+    private Boolean available;
+
+    private Integer stock;
 
     @ManyToOne(targetEntity = Category.class)
     Category category;
