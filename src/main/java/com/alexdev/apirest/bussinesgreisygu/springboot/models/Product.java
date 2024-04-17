@@ -1,8 +1,6 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Builder
@@ -13,17 +11,16 @@ import lombok.*;
 @Entity
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String urlImg;
+    private String img;
 
     private String description;
 
     private Double price;
 
     private Boolean available;
-
-    private Integer stock;
 
     @ManyToOne(targetEntity = Category.class)
     Category category;
