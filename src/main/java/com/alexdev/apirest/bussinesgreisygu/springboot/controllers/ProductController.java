@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
@@ -25,6 +24,11 @@ public class ProductController {
         return service.findAll();
     }
 
+    @GetMapping("/search")
+    public List<Product> findByName(@RequestParam String description){
+        return service.findByDescriptionContaining( description );
+    }
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -33,15 +37,13 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public Product findProductById(@RequestParam Long id){
-        return service.findProduct( id )
-                .orElseThrow( RuntimeException::new );
+    public Product findProductById(@PathVariable Long id){
+        return service.findProduct( id );
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteProductById( @RequestParam Long id ){
-        Optional.of(findProductById( id ))
-                .ifPresent( product -> service.delete( product.getId() ) );
+    public void deleteProductById( @PathVariable Long id ){
+       service.delete( id );
     }
 }
