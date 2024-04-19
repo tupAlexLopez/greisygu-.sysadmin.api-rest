@@ -20,28 +20,32 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findByDescription(String description) {
-        return repository.findByDescription( description );
+        return repository.findByDescriptionContaining( description );
     }
 
     @Override
-    public List<Product> findByDescriptionContaining(String description) {
-        return repository.findByDescriptionContaining( description );
+    public List<Product> findByDescriptionAndCategoryName(String description, String nameCategory) {
+        return repository.findByDescriptionContainingIgnoreCaseAndCategoryNameContainingIgnoreCase( description, nameCategory );
+    }
+
+    @Override
+    public List<Product> findByCategoryName(String name) {
+        return repository.findByCategoryName(name);
     }
 
     @Override
     public Product save(Product product) {
         return repository.save(product);
     }
-
     @Override
-    public Product findProduct(Long id) {
-        return repository.findById(id)
+    public Product findById( Long id ) {
+        return repository.findById( id )
                 .orElseThrow( RuntimeException::new );
     }
 
     @Override
     public void delete(Long id) {
-        Optional.of( findProduct( id ) )
+        Optional.of( findById( id ) )
                 .ifPresent( product -> repository.delete( product ) );
     }
 }

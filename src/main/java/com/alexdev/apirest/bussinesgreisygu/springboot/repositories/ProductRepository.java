@@ -7,6 +7,9 @@ import java.util.List;
 
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByDescription(String description);
+    List<Product> findByCategoryName(String name);
+
+    List<Product> findByDescriptionContainingIgnoreCaseAndCategoryNameContainingIgnoreCase(String description, String name);
+
     List<Product> findByDescriptionContaining(String description);
 }

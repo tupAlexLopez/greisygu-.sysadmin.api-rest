@@ -7,9 +7,11 @@ import java.util.List;
 
 public interface ProductService {
     List<Product> findAll();
-    List<Product> findByDescription( String description );
-    List<Product> findByDescriptionContaining( String description );
+    List<Product> findByDescription(String description);
+    List<Product> findByDescriptionAndCategoryName(String description, String nameCategory);
+    List<Product> findByCategoryName( String name);
+
+    Product findById( Long id );
     Product save(Product product);
-    Product findProduct(Long id);
     void delete(Long id);
 }
