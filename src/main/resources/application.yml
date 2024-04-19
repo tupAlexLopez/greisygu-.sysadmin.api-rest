@@ -12,3 +12,8 @@ info:
 springdoc:
   swagger-ui:
     path: /
+
+url:
+  upload:
+    windows: C://Windows//Temp//uploads//
+    linux: /tmp/uploads/
