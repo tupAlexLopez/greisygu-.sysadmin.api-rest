@@ -2,6 +2,7 @@ package com.alexdev.apirest.bussinesgreisygu.springboot.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Builder
 @AllArgsConstructor
@@ -22,6 +23,6 @@ public class Product {
 
     private Boolean available;
 
-    @ManyToOne(targetEntity = Category.class)
+    @ManyToOne
     Category category;
 }
