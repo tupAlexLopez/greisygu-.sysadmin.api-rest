@@ -30,8 +30,17 @@ public class CategoryController {
         return service.update( id, category );
     }
 
+    @GetMapping("/{id}")
+    public Category findCategoryById(@PathVariable Long id){
+        return service.findBy( id );
+    }
+
     @DeleteMapping("/{id}")
     public void deleteCategory(@PathVariable Long id){
         service.delete( id );
+    }
+    @GetMapping("/search")
+    public Category findCategoryByName(@RequestParam String name){
+        return service.findBy( name );
     }
 }

@@ -1,5 +1,6 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.services.impl;
 
+import com.alexdev.apirest.bussinesgreisygu.springboot.exceptions.NotFoundException;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Category;
 import com.alexdev.apirest.bussinesgreisygu.springboot.repositories.CategoryRepository;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.CategoryService;
@@ -7,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -25,21 +25,27 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category update(Long id, Category category) {
-        Category categorySaved = findById( id ).orElseThrow();
+        Category categorySaved = findBy( id );
         categorySaved.setName(category.getName());
 
         return repository.save( categorySaved );
     }
 
-
     @Override
-    public Optional<Category> findById(Long id) {
-        return repository.findById( id );
+    public Category findBy(String name) {
+        return repository.findByName( name )
+                .orElseThrow( NotFoundException::new );
+    }
+    @Override
+    public Category findBy(Long id) {
+        return repository.findById( id )
+                .orElseThrow( NotFoundException::new );
     }
 
     @Override
     public void delete(Long id) {
-        findById(id)
-                .ifPresent( category -> repository.delete( category ));
+        Category categoryToDelete = findBy( id );
+
+        repository.delete( categoryToDelete );
     }
 }
