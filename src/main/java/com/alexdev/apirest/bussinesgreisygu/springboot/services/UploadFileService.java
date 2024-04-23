@@ -8,20 +8,24 @@ import java.net.MalformedURLException;
 
 public interface UploadFileService {
     /**
+     *  Crea un directorio externo raiz para almacenar alli las imagenes que se guardaran del proyecto.
+     * @throws IOException Si el PATH no es valido.
+     */
+    void init() throws IOException;
+
+    /**
      *  Busca un archivo con el nombre especificado como parametro.
      * @param filename nombre de archivo
      * @return Un recurso.
-     * @throws MalformedURLException si se especifico mal la URI del recurso.
      */
-    Resource search(String filename) throws MalformedURLException;
+    Resource search(String filename);
 
     /**
      *  Registra el archivo en el directorio externo del proyecto.
      * @param file MultipartFile
      * @return nombre del archivo registrado en el directorio externo.
-     * @throws IOException Si ocurre algun error.
      */
-    String insert(MultipartFile file) throws IOException;
+    String store(MultipartFile file);
 
     /**
      * Elimina un archivo de imagen en el directorio externo.
@@ -30,11 +34,7 @@ public interface UploadFileService {
      */
     boolean delete(String filename);
 
+    String update( String filename, MultipartFile newFile );
     // Elimina todas las imagenes de manera recursiva, incluyendo el PATH.
     void deleteAll();
-    /**
-     *  Crea un directorio externo raiz para almacenar alli las imagenes que se guardaran del proyecto.
-     * @throws IOException Si el PATH no es valido.
-     */
-    void init() throws IOException;
 }
