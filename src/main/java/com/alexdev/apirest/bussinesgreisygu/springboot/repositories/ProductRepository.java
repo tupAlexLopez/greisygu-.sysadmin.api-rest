@@ -7,9 +7,10 @@ import java.util.List;
 
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByAvailable( Boolean available );
     List<Product> findByCategoryName(String name);
-
     List<Product> findByDescriptionContainingIgnoreCaseAndCategoryNameContainingIgnoreCase(String description, String name);
+    List<Product> findByDescriptionContainingIgnoreCaseAndCategoryNameContainingIgnoreCaseAndAvailable(String description, String name, Boolean available);
 
-    List<Product> findByDescriptionContaining(String description);
+    List<Product> findByDescriptionContainingIgnoreCase(String description);
 }
