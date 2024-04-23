@@ -1,6 +1,6 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.controllers;
 
-import com.alexdev.apirest.bussinesgreisygu.springboot.models.response.MediaResponse;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.response.MediaResponse;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.UploadFileService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
