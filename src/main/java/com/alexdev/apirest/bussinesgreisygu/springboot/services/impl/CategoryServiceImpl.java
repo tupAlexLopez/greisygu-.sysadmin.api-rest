@@ -3,6 +3,7 @@ package com.alexdev.apirest.bussinesgreisygu.springboot.services.impl;
 import com.alexdev.apirest.bussinesgreisygu.springboot.exceptions.NotFoundException;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Category;
 import com.alexdev.apirest.bussinesgreisygu.springboot.repositories.CategoryRepository;
+import com.alexdev.apirest.bussinesgreisygu.springboot.repositories.ProductRepository;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl implements CategoryService {
     @Autowired CategoryRepository repository;
+    @Autowired ProductRepository productRepository;
 
     @Override
     public List<Category> findAll() {
@@ -45,7 +47,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(Long id) {
         Category categoryToDelete = findBy( id );
-
+        productRepository.deleteAllProductsByCategoryId( id );
         repository.delete( categoryToDelete );
     }
+
 }
