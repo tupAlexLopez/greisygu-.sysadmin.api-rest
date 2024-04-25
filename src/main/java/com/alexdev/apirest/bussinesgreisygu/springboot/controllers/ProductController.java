@@ -3,6 +3,9 @@ package com.alexdev.apirest.bussinesgreisygu.springboot.controllers;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +25,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> getAllproducts(){
-        return service.findAll();
+    public Page<Product> getAllproducts(@PageableDefault(size = 5) Pageable page){
+        return service.findAll( page );
     }
 
     @PostMapping

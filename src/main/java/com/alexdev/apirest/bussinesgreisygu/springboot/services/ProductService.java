@@ -1,12 +1,14 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.services;
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 
 public interface ProductService {
-    List<Product> findAll();
+    Page<Product> findAll(Pageable pageable);
     
     List<Product> findByDescription(String description);
     List<Product> findByCategoryName( String name);
