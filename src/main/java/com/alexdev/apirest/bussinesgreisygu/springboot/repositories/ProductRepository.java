@@ -2,19 +2,24 @@ package com.alexdev.apirest.bussinesgreisygu.springboot.repositories;
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+    Page<Product> findByCategoryName(String name, Pageable pageable);
+    Page<Product> findByDescriptionContainingIgnoreCase(String description, Pageable pageable);
+    Page<Product> findByAvailable( Boolean available , Pageable pageable);
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByAvailable( Boolean available );
-    List<Product> findByCategoryName(String name);
-    List<Product> findByDescriptionContainingIgnoreCaseAndCategoryNameContainingIgnoreCase(String description, String name);
-    List<Product> findByDescriptionContainingIgnoreCaseAndCategoryNameContainingIgnoreCaseAndAvailable(String description, String name, Boolean available);
-    List<Product> findByDescriptionContainingIgnoreCase(String description);
+    Page<Product> findByDescriptionContainingIgnoreCaseAndCategoryNameAndAvailable(String description, String category, Boolean available, Pageable pageable);
+    Page<Product> findByDescriptionContainingIgnoreCaseAndCategoryName(String description, String category, Pageable pageable);
+    Page<Product> findByDescriptionContainingIgnoreCaseAndAvailable(String description, Boolean available, Pageable pageable );
+    Page<Product> findByCategoryNameAndAvailable(String name, Boolean available, Pageable pageable );
+
 
     @Transactional
     @Modifying
