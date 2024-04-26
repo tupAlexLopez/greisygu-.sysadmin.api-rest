@@ -1,5 +1,6 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.services.impl;
 
+import com.alexdev.apirest.bussinesgreisygu.springboot.exceptions.NotFoundException;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
 import com.alexdev.apirest.bussinesgreisygu.springboot.repositories.ProductRepository;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.ProductService;
@@ -7,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -20,6 +19,31 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<Product> filterBy(String description, String category, Boolean available, Pageable pageable) {
+        if( description != null && category != null && available != null ){
+            return repository.findByDescriptionContainingIgnoreCaseAndCategoryNameAndAvailable( description, category , available, pageable );
+        }else if( description != null && category != null  ){
+            return repository.findByDescriptionContainingIgnoreCaseAndCategoryName( description, category , pageable);
+        }else if( description != null && available != null  ){
+            return repository.findByDescriptionContainingIgnoreCaseAndAvailable(description, available, pageable);
+        }else if( category != null && available != null ) {
+            return repository.findByCategoryNameAndAvailable( category, available, pageable );
+        }
+
+        if( description != null ){
+            return repository.findByDescriptionContainingIgnoreCase(description, pageable);
+        }
+        if( category != null ) {
+            return repository.findByCategoryName(category, pageable);
+        }
+        if( available != null ){
+            return repository.findByAvailable(available, pageable);
+        }
+
+        throw new RuntimeException();
+    }
+
+    @Override
     public Product save(Product product) {
         return repository.save(product);
     }
@@ -27,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product findBy( Long id ) {
         return repository.findById( id )
-                .orElseThrow( RuntimeException::new );
+                .orElseThrow( NotFoundException::new );
     }
 
     @Override
@@ -58,28 +82,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> findByCategoryName(String name) {
-        return repository.findByCategoryName(name);
+    public Page<Product> findByCategoryName(String name, Pageable pageable) {
+        return repository.findByCategoryName( name, pageable );
     }
 
     @Override
-    public List<Product> findByDescription(String description) {
-        return repository.findByDescriptionContainingIgnoreCase( description );
+    public Page<Product> findByAvailable(Boolean available, Pageable pageable) {
+        return repository.findByAvailable( available, pageable );
     }
-
-    @Override
-    public List<Product> findByAvailable(Boolean available) {
-        return repository.findByAvailable( available );
-    }
-
-    @Override
-    public List<Product> findByDescriptionAndCategoryName(String description, String nameCategory) {
-        return repository.findByDescriptionContainingIgnoreCaseAndCategoryNameContainingIgnoreCase( description, nameCategory );
-    }
-
-    @Override
-    public List<Product> findByDescriptionAndCategoryNameAndAvailable(String description, String nameCategory, Boolean available) {
-        return repository.findByDescriptionContainingIgnoreCaseAndCategoryNameContainingIgnoreCaseAndAvailable( description, nameCategory, available );
-    }
-
 }

@@ -4,17 +4,12 @@ import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 
 public interface ProductService {
     Page<Product> findAll(Pageable pageable);
-    
-    List<Product> findByDescription(String description);
-    List<Product> findByCategoryName( String name);
-    List<Product> findByDescriptionAndCategoryName(String description, String nameCategory);
-    List<Product> findByDescriptionAndCategoryNameAndAvailable(String description, String nameCategory, Boolean available);
-    List<Product> findByAvailable(Boolean available);
+    Page<Product> filterBy(String description, String category, Boolean available, Pageable pageable);
+    Page<Product> findByCategoryName( String name, Pageable pageable);
+    Page<Product> findByAvailable(Boolean available, Pageable pageable);
     Product findBy( Long productId );
 
     Product save(Product product);
