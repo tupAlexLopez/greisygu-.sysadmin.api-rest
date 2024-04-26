@@ -9,9 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
-import java.util.Map;
 
 
 @RestController
@@ -58,24 +56,22 @@ public class ProductController {
 
 
     @GetMapping("/category/{name}")
-    public List<Product> findProductCategoryByName(@PathVariable String name){
-        return service.findByCategoryName( name );
+    public Page<Product> findProductCategoryByName(@PathVariable String name, @PageableDefault(size = 5) Pageable pageable){
+        return service.findByCategoryName( name, pageable );
     }
 
     @GetMapping("/available/{available}")
-    public List<Product> findProductCategoryByName(@PathVariable Boolean available){
-        return service.findByAvailable( available );
+    public Page<Product> findProductCategoryByName(@PathVariable Boolean available, @PageableDefault(size = 5) Pageable pageable){
+        return service.findByAvailable( available, pageable );
     }
 
     @GetMapping("/search")
-    public List<Product> findByFilter(@RequestParam Map<String, String> params) {
-        if (params.containsKey("description") && params.containsKey("category") && params.containsKey("available")) {
-            return service.findByDescriptionAndCategoryNameAndAvailable(params.get("description"), params.get("category"), Boolean.valueOf(params.get("available")));
-        }else if( params.containsKey("description") && params.containsKey("category") ){
-            return service.findByDescriptionAndCategoryName( params.get("description"), params.get("category") );
-        }
+    public Page<Product> buscarPersonas(
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Boolean available,
+            @PageableDefault(size = 5) Pageable pageable) {
 
-
-        return service.findByDescription(params.get("description"));
+       return service.filterBy( description, category, available, pageable );
     }
 }
