@@ -2,6 +2,8 @@ package com.alexdev.apirest.bussinesgreisygu.springboot.controllers;
 
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Category;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.request.CategoryRequest;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.response.MessageResponse;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +14,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
-    @Autowired CategoryService service;
+    private final CategoryService service;
+
+    @Autowired
+    public CategoryController(CategoryService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<Category> getAll(){
@@ -21,13 +28,21 @@ public class CategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Category postCategory(@RequestBody Category category){
-        return service.save( category );
+    public MessageResponse postCategory(@RequestBody CategoryRequest categoryRequest){
+        service.save( categoryRequest );
+
+        return MessageResponse.builder()
+                .message("Categoria correctamente creada.")
+                .build();
     }
 
     @PutMapping("/{id}")
-    public Category updateCategory(@PathVariable Long id, @RequestBody Category category){
-        return service.update( id, category );
+    public MessageResponse updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryRequest){
+        service.update( id, categoryRequest );
+
+        return MessageResponse.builder()
+                .message( "Categoria correctamente modificada." )
+                .build();
     }
 
     @GetMapping("/{id}")
@@ -39,6 +54,7 @@ public class CategoryController {
     public void deleteCategory(@PathVariable Long id){
         service.delete( id );
     }
+
     @GetMapping("/search")
     public Category findCategoryByName(@RequestParam String name){
         return service.findBy( name );

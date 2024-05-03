@@ -2,6 +2,7 @@ package com.alexdev.apirest.bussinesgreisygu.springboot.services.impl;
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.exceptions.NotFoundException;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Category;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.request.CategoryRequest;
 import com.alexdev.apirest.bussinesgreisygu.springboot.repositories.CategoryRepository;
 import com.alexdev.apirest.bussinesgreisygu.springboot.repositories.ProductRepository;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.CategoryService;
@@ -12,8 +13,14 @@ import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
-    @Autowired CategoryRepository repository;
-    @Autowired ProductRepository productRepository;
+    private final CategoryRepository repository;
+    private final ProductRepository productRepository;
+
+    @Autowired
+    public CategoryServiceImpl(CategoryRepository repository, ProductRepository productRepository) {
+        this.repository = repository;
+        this.productRepository = productRepository;
+    }
 
     @Override
     public List<Category> findAll() {
@@ -21,16 +28,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category save(Category category) {
-        return repository.save(category);
+    public void save(CategoryRequest categoryRequest) {
+        repository.save( Category.builder().name(categoryRequest.getName() ).build() );
     }
 
     @Override
-    public Category update(Long id, Category category) {
-        Category categorySaved = findBy( id );
-        categorySaved.setName(category.getName());
+    public void update(Long id, CategoryRequest categoryRequest) {
+        Category categoryToUpdate = findBy( id );
+        categoryToUpdate.setName(categoryRequest.getName());
 
-        return repository.save( categorySaved );
+        repository.save( categoryToUpdate );
     }
 
     @Override
