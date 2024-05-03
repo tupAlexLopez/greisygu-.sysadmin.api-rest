@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter @Setter
 @Schema(name = "Error")
-public class ErrorResponse {
-    @Schema(description = "message", example = "Mensaje de error.")
+public class MessageResponse {
+    @Schema(description = "message", example = "Mensaje de exito / error servidor")
     private String message;
 }

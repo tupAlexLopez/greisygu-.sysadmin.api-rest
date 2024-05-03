@@ -1,7 +1,7 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.exceptions;
 
 
-import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.response.ErrorResponse;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.response.MessageResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,16 +15,16 @@ public class HandlerException {
 
     @ExceptionHandler( NotFoundException.class )
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse notFoundResponse( NotFoundException nfe ) {
-        return ErrorResponse.builder()
+    public MessageResponse notFoundResponse( NotFoundException nfe ) {
+        return MessageResponse.builder()
                 .message( NOT_FOUND_MESSAGE )
                 .build();
     }
 
     @ExceptionHandler( AlreadyExistException.class )
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse notFoundResponse( AlreadyExistException aee ) {
-        return ErrorResponse.builder()
+    public MessageResponse notFoundResponse(AlreadyExistException aee ) {
+        return MessageResponse.builder()
                 .message( ALREADY_EXIST_MESSAGE )
                 .build();
     }
