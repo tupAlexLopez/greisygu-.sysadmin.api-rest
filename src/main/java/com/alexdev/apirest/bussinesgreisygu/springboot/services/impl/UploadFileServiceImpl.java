@@ -21,7 +21,12 @@ import java.nio.file.StandardCopyOption;
 
 @Service
 public class UploadFileServiceImpl implements UploadFileService {
-    @Autowired PathUtil pathUtil;
+    private final PathUtil pathUtil;
+
+    @Autowired
+    public UploadFileServiceImpl(PathUtil pathUtil) {
+        this.pathUtil = pathUtil;
+    }
 
     @Override
     @PostConstruct
@@ -88,13 +93,4 @@ public class UploadFileServiceImpl implements UploadFileService {
 
         return file.delete();
     }
-
-    @Override
-    public void deleteAll() {
-        FileSystemUtils.deleteRecursively(  pathUtil.rootPath().toFile() );
-        try {
-            Files.deleteIfExists( pathUtil.rootPath() );
-        }catch (IOException ignored){ };
-    }
-
 }

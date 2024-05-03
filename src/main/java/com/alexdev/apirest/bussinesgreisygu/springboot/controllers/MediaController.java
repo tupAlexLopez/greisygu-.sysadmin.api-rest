@@ -18,10 +18,14 @@ import java.nio.file.Files;
 @RestController
 @RequestMapping("/media")
 public class MediaController {
-    @Autowired
-    UploadFileService uploadService;
+    private final UploadFileService uploadService;
 
-    @Autowired HttpServletRequest req;
+    private final HttpServletRequest req;
+    @Autowired
+    public MediaController(UploadFileService uploadService, HttpServletRequest req) {
+        this.uploadService = uploadService;
+        this.req = req;
+    }
 
     @PostMapping("/upload")
     @ResponseStatus(HttpStatus.OK)
