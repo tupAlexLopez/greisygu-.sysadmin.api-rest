@@ -1,6 +1,7 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.services;
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.request.ProductRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,8 +13,8 @@ public interface ProductService {
     Page<Product> findByAvailable(Boolean available, Pageable pageable);
     Product findBy( Long productId );
 
-    Product save(Product product);
-    Product update(Long id, Product productUpdated);
+    void save(ProductRequest request);
+    void update(Long id, ProductRequest request);
     void updateAvailableBy(Long id, boolean available );
     void delete(Long id);
 }

@@ -1,6 +1,5 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.request;
 
-import com.alexdev.apirest.bussinesgreisygu.springboot.models.Category;
 import lombok.*;
 
 @Builder
@@ -12,5 +11,5 @@ public class ProductRequest {
     private Double price;
     private String img;
     private Boolean available;
-    Category category;
+    Long category;
 }

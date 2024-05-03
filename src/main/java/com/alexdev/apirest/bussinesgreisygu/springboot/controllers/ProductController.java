@@ -1,6 +1,8 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.controllers;
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.request.ProductRequest;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.response.MessageResponse;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,9 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/products")
@@ -29,8 +28,12 @@ public class ProductController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Product saveProduct(@RequestBody Product product) {
-        return service.save( product );
+    public MessageResponse saveProduct(@RequestBody ProductRequest request) {
+        service.save( request );
+
+        return MessageResponse.builder()
+                .message( "Producto correctamente creado." )
+                .build();
     }
 
     @GetMapping("/{id}")
@@ -39,8 +42,12 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public Product updateProduct( @PathVariable Long id, @RequestBody Product product ){
-        return service.update( id, product );
+    public MessageResponse updateProduct( @PathVariable Long id, @RequestBody ProductRequest request ){
+        service.update( id, request );
+
+        return MessageResponse.builder()
+                .message( "Producto correctamente modificado." )
+                .build();
     }
 
     @PatchMapping("/{id}/{available}")

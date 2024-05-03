@@ -1,7 +1,10 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.services.impl;
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.exceptions.NotFoundException;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.Category;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.request.ProductRequest;
+import com.alexdev.apirest.bussinesgreisygu.springboot.models.mappers.impl.ProductMapper;
 import com.alexdev.apirest.bussinesgreisygu.springboot.repositories.ProductRepository;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +14,51 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-    @Autowired ProductRepository repository;
+    private final ProductRepository repository;
+    private final ProductMapper mapper;
+
+    @Autowired
+    public ProductServiceImpl(ProductRepository repository, ProductMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
     @Override
     public Page<Product> findAll(Pageable pageable) {
         return repository.findAll(pageable);
+    }
+
+    @Override
+    public void save(ProductRequest productRequest) {
+        Product productToSave = mapper.dtoToEntity( productRequest );
+
+        repository.save( productToSave );
+    }
+
+    @Override
+    public void update(Long id, ProductRequest request) {
+
+        Product productToUpdate = findBy( id );
+        productToUpdate.setDescription( request.getDescription() );
+        productToUpdate.setPrice( request.getPrice() );
+        productToUpdate.setImg( request.getImg() );
+        productToUpdate.setAvailable( request.getAvailable() );
+        productToUpdate.setCategory( Category.builder().id(request.getCategory()).build() );
+
+        repository.save( productToUpdate );
+    }
+
+    @Override
+    public Product findBy( Long id ) {
+        return repository.findById( id )
+                .orElseThrow( NotFoundException::new );
+    }
+
+    @Override
+    public void delete(Long id) {
+        Product productToDelete = findBy( id );
+
+        repository.delete( productToDelete );
     }
 
     @Override
@@ -41,36 +84,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         throw new RuntimeException();
-    }
-
-    @Override
-    public Product save(Product product) {
-        return repository.save(product);
-    }
-
-    @Override
-    public Product findBy( Long id ) {
-        return repository.findById( id )
-                .orElseThrow( NotFoundException::new );
-    }
-
-    @Override
-    public Product update(Long id, Product product) {
-        Product productToUpdate = findBy( id );
-        productToUpdate.setDescription( product.getDescription() );
-        productToUpdate.setPrice( product.getPrice() );
-        productToUpdate.setImg( product.getImg() );
-        productToUpdate.setAvailable( product.getAvailable() );
-        productToUpdate.setCategory( product.getCategory() );
-
-        return repository.save( productToUpdate );
-    }
-
-    @Override
-    public void delete(Long id) {
-        Product productToDelete = findBy( id );
-
-        repository.delete( productToDelete );
     }
 
     @Override
