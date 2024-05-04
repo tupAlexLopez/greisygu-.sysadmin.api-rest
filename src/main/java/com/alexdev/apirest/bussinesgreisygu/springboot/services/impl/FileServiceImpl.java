@@ -1,13 +1,12 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.services.impl;
 
-import com.alexdev.apirest.bussinesgreisygu.springboot.services.UploadFileService;
+import com.alexdev.apirest.bussinesgreisygu.springboot.services.FileService;
 import com.alexdev.apirest.bussinesgreisygu.springboot.utils.PathUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -20,11 +19,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @Service
-public class UploadFileServiceImpl implements UploadFileService {
+public class FileServiceImpl implements FileService {
     private final PathUtil pathUtil;
 
     @Autowired
-    public UploadFileServiceImpl(PathUtil pathUtil) {
+    public FileServiceImpl(PathUtil pathUtil) {
         this.pathUtil = pathUtil;
     }
 
@@ -61,11 +60,11 @@ public class UploadFileServiceImpl implements UploadFileService {
             throw new RuntimeException("No se encontro archivo existente a modificar");
 
         delete( filename );
-        return store( newFile );
+        return upload( newFile );
     }
 
     @Override
-    public String store(MultipartFile file) {
+    public String upload(MultipartFile file) {
         if( file.isEmpty() || file.getOriginalFilename() == null )
             throw new RuntimeException("File is empty.");
 

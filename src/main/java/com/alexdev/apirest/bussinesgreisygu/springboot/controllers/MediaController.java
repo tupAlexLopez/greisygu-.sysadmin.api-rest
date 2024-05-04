@@ -1,7 +1,7 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.controllers;
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.response.MediaResponse;
-import com.alexdev.apirest.bussinesgreisygu.springboot.services.UploadFileService;
+import com.alexdev.apirest.bussinesgreisygu.springboot.services.FileService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -18,11 +18,11 @@ import java.nio.file.Files;
 @RestController
 @RequestMapping("/media")
 public class MediaController {
-    private final UploadFileService uploadService;
+    private final FileService uploadService;
 
     private final HttpServletRequest req;
     @Autowired
-    public MediaController(UploadFileService uploadService, HttpServletRequest req) {
+    public MediaController(FileService uploadService, HttpServletRequest req) {
         this.uploadService = uploadService;
         this.req = req;
     }
@@ -30,7 +30,7 @@ public class MediaController {
     @PostMapping("/upload")
     @ResponseStatus(HttpStatus.OK)
     public MediaResponse saveImageProduct(@RequestParam("file") MultipartFile file) throws IOException {
-        String filename =uploadService.store( file );
+        String filename =uploadService.upload( file );
         return MediaResponse.builder()
                 .url( getUrlImage( filename ) )
                 .filename( filename )

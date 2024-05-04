@@ -5,12 +5,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-public interface UploadFileService {
+public interface FileService {
     void init() throws IOException;
 
     Resource search(String filename);
 
-    String store(MultipartFile file);
+    String upload(MultipartFile file);
 
     boolean delete(String filename);
 
