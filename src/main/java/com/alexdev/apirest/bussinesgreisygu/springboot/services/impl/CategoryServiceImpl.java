@@ -54,7 +54,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(Long id) {
         Category categoryToDelete = findBy( id );
-        productRepository.deleteAllProductsByCategoryId( id );
         repository.delete( categoryToDelete );
     }
 

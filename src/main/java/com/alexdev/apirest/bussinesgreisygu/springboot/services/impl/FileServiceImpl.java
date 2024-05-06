@@ -3,6 +3,7 @@ package com.alexdev.apirest.bussinesgreisygu.springboot.services.impl;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.FileService;
 import com.alexdev.apirest.bussinesgreisygu.springboot.utils.PathUtil;
 import jakarta.annotation.PostConstruct;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -88,7 +89,7 @@ public class FileServiceImpl implements FileService {
         File file = pathUtil.rootPath().resolve( filename ).toFile();
 
         if (!file.exists() || !file.canRead())
-            return false;
+            throw new RuntimeException( "No se pudo eliminar la imagen." );
 
         return file.delete();
     }

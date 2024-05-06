@@ -27,7 +27,7 @@ public class MediaController {
         this.req = req;
     }
 
-    @PostMapping("/upload")
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public MediaResponse saveImageProduct(@RequestParam("file") MultipartFile file) throws IOException {
         String filename =uploadService.upload( file );

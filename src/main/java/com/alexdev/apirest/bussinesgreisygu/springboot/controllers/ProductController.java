@@ -61,6 +61,12 @@ public class ProductController {
         service.delete( id );
     }
 
+    @DeleteMapping("/category/{categoryID}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAllProductByCategory( @PathVariable Long categoryID ){
+        service.deleteAllByCategory( categoryID );
+    }
+
 
     @GetMapping("/category/{name}")
     public Page<Product> findProductCategoryByName(@PathVariable String name, @PageableDefault(size = 5) Pageable pageable){

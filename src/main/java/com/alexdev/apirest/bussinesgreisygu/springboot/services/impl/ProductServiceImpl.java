@@ -58,7 +58,12 @@ public class ProductServiceImpl implements ProductService {
     public void delete(Long id) {
         Product productToDelete = findBy( id );
 
-        repository.delete( productToDelete );
+        repository.deleteById( productToDelete.getId() );
+    }
+
+    @Override
+    public void deleteAllByCategory(Long categoryID) {
+        repository.deleteAllProductsByCategoryId( categoryID );
     }
 
     @Override

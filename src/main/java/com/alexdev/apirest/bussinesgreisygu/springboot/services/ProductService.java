@@ -17,4 +17,5 @@ public interface ProductService {
     void update(Long id, ProductRequest request);
     void updateAvailableBy(Long id, boolean available );
     void delete(Long id);
+    void deleteAllByCategory( Long categoryID );
 }
