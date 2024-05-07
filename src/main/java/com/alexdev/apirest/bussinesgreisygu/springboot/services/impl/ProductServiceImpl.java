@@ -1,7 +1,6 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.services.impl;
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.exceptions.NotFoundException;
-import com.alexdev.apirest.bussinesgreisygu.springboot.models.Category;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.request.ProductRequest;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.mappers.impl.ProductMapper;
@@ -11,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -37,15 +38,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void update(Long id, ProductRequest request) {
+        Optional.of( findBy( id ) )
+                .ifPresent( product -> {
+                    Product productToUpdate = mapper.dtoToEntity( request );
+                    productToUpdate.setId( product.getId() );
 
-        Product productToUpdate = findBy( id );
-        productToUpdate.setDescription( request.getDescription() );
-        productToUpdate.setPrice( request.getPrice() );
-        productToUpdate.setImg( request.getImg() );
-        productToUpdate.setAvailable( request.getAvailable() );
-        productToUpdate.setCategory( Category.builder().id(request.getCategory()).build() );
-
-        repository.save( productToUpdate );
+                    repository.save( productToUpdate );
+                });
     }
 
     @Override
@@ -97,15 +96,5 @@ public class ProductServiceImpl implements ProductService {
         product.setAvailable( available );
 
         repository.save( product );
-    }
-
-    @Override
-    public Page<Product> findByCategoryName(String name, Pageable pageable) {
-        return repository.findByCategoryName( name, pageable );
-    }
-
-    @Override
-    public Page<Product> findByAvailable(Boolean available, Pageable pageable) {
-        return repository.findByAvailable( available, pageable );
     }
 }

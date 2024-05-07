@@ -6,8 +6,6 @@ import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.request.Produc
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.mappers.impl.ProductMapper;
 import com.alexdev.apirest.bussinesgreisygu.springboot.repositories.ProductRepository;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.impl.ProductServiceImpl;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,8 +26,10 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
-    Pageable testPageable;
-    List<Product> testProducts;
+    private Pageable testPageable;
+    private List<Product> testProducts;
+    private ProductRequest testProductRequest;
+    private Product testProduct;
 
     @Mock
     ProductMapper mapper;
@@ -41,8 +41,26 @@ public class ProductServiceTest {
     ProductServiceImpl service;
 
     @BeforeEach
-    void init(){
+    void initEach(){
         testPageable = PageRequest.of( 0, 5 );
+        testProductRequest = ProductRequest.builder()
+                .description( "Test product" )
+                .price( 123d )
+                .available( true )
+                .img("image.png")
+                .category( 1L )
+                .build();
+
+        testProduct = Product.builder()
+                .description( "Test product" )
+                .price( 123d )
+                .available( true )
+                .img("image.png")
+                .category( Category.builder()
+                        .id( 1L )
+                        .build() )
+                .build();
+
         testProducts = List.of(
                 Product.builder()
                         .id(1L)
@@ -100,6 +118,7 @@ public class ProductServiceTest {
         verify( repository, times(1) ).findAll( testPageable );
         assertEquals( testProducts.size(), products.getTotalElements() );
     }
+
     @Test
     @DisplayName("Deberia obtener un producto(ID) en especifico")
     void testShouldGetByIDProductsSuccessfully() {
@@ -119,18 +138,19 @@ public class ProductServiceTest {
     @DisplayName("Deberia guardar un producto.")
     void testShouldSaveProductSuccessfully() {
         //Arrange
-        Product product = testProducts.get(0);
-        ProductRequest productRequest = mapper.entityToDto( product );
+        ProductRequest productToSave = testProductRequest;
+        Product savedProduct = testProduct;
 
-        when( mapper.dtoToEntity( productRequest ) ).thenReturn( product );
-        when( repository.save( product ) ).thenReturn( product );
+        when( mapper.dtoToEntity( productToSave ) ).thenReturn( savedProduct );
+        savedProduct.setId( 5L );
+        when( repository.save( savedProduct ) ).thenReturn( savedProduct );
 
         //Act
-        service.save( productRequest );
+        service.save( productToSave );
 
         //Assert
-        verify( mapper, times(1) ).dtoToEntity( productRequest );
-        verify( repository, times(1) ).save( product );
+        verify( mapper, times(1) ).dtoToEntity( productToSave );
+        verify( repository, times(1) ).save( testProduct );
     }
 
     @Test
@@ -139,6 +159,7 @@ public class ProductServiceTest {
         Product productToUpdate =testProducts.get(0);
         productToUpdate.setPrice(123.23);
         productToUpdate.setAvailable( false );
+
         ProductRequest productRequest = ProductRequest.builder()
                 .description( productToUpdate.getDescription() )
                 .price( productToUpdate.getPrice() )
@@ -148,6 +169,7 @@ public class ProductServiceTest {
                 .build();
 
 
+        when( mapper.dtoToEntity( productRequest ) ).thenReturn( productToUpdate );
         when( repository.findById( productToUpdate.getId() ) ).thenReturn( Optional.of( testProducts.get(0) ) );
         when( repository.save( productToUpdate ) ).thenReturn( productToUpdate );
 
@@ -155,20 +177,21 @@ public class ProductServiceTest {
         service.update(productToUpdate.getId(), productRequest);
 
         //Assert
+        verify( mapper, times( 1 ) ).dtoToEntity( productRequest );
         verify( repository, times(1) ).findById( productToUpdate.getId() );
         verify( repository, times(1) ).save( productToUpdate );
     }
 
     @Test
     @DisplayName("Deberia modificar la disponibilidad del producto.")
-    void testShouldUpdateByAvailable(){
+    void testShouldUpdateByAvailableSuccessfully(){
         //Arrange
         boolean available =false;
-        Long productID =testProducts.get(0).getId();
         Product product =testProducts.get(0);
-        product.setAvailable( available );
+        Long productID =product.getId();
 
         when( repository.findById( productID ) ).thenReturn( Optional.of( product ) );
+        product.setAvailable( available );
         when( repository.save( product )  ).thenReturn( product );
 
         //Act
@@ -199,21 +222,23 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Deberia filtrar productos por nombre de categoria")
-    void testShouldFilterByCategoryName(){
+    void testShouldFilterByCategoryNameSuccessfully(){
         //Arrange
-        String category = testProducts.get(0).getCategory().getName();
+        String category = "Pastas";
 
         List<Product> productsByCategoryName =testProducts.stream()
-                .filter( products -> category.equals(products.getCategory().getName()) )
+                .filter( products -> category.equalsIgnoreCase(products.getCategory().getName()) )
                 .toList();
 
         Page<Product> productPageToReturn = new PageImpl<>(productsByCategoryName, testPageable, testProducts.size());
         when( repository.findByCategoryName( category, testPageable ) ).thenReturn( productPageToReturn );
 
         //Act
-        Page<Product> pageResult =service.findByCategoryName( category, testPageable );
+        Page<Product> pageResult =service.filterBy( null, category, null, testPageable );
 
         //Assert
+        verify( repository, times(1) ).findByCategoryName( category, testPageable );
+
         assertNotNull( pageResult );
         assertEquals( productsByCategoryName.size(), pageResult.getTotalElements() );
     }
@@ -238,10 +263,13 @@ public class ProductServiceTest {
         when( repository.findByAvailable( false, testPageable ) ).thenReturn( productPageToReturnIfAvailableFalse );
 
         //Act
-        Page<Product> pageResultTrue =service.findByAvailable( true, testPageable );
-        Page<Product> pageResultFalse =service.findByAvailable( false, testPageable );
+        Page<Product> pageResultTrue =service.filterBy( null , null , true, testPageable );
+        Page<Product> pageResultFalse =service.filterBy( null , null , false, testPageable );
 
         //Assert
+        verify(repository, times(1)).findByAvailable( true, testPageable );
+        verify(repository, times(1)).findByAvailable( false, testPageable );
+
         assertNotNull( pageResultTrue );
         assertNotNull( pageResultFalse );
         assertEquals( sizeExpected, pageResultTrue.getTotalElements() );

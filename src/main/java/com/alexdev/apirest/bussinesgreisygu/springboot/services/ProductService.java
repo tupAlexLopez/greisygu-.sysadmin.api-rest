@@ -9,8 +9,6 @@ import org.springframework.data.domain.Pageable;
 public interface ProductService {
     Page<Product> findAll(Pageable pageable);
     Page<Product> filterBy(String description, String category, Boolean available, Pageable pageable);
-    Page<Product> findByCategoryName( String name, Pageable pageable);
-    Page<Product> findByAvailable(Boolean available, Pageable pageable);
     Product findBy( Long productId );
 
     void save(ProductRequest request);
