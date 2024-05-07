@@ -33,13 +33,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ProductController.class)
 public class ProductControllerTest {
-    Pageable testPageable;
-    List<Product> testProducts;
+    private Pageable testPageable;
+    private List<Product> testProducts;
+
+    private final ObjectMapper mapper;
+    private final MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper mapper;
-    @Autowired
-    MockMvc mockMvc;
+    public ProductControllerTest(ObjectMapper mapper, MockMvc mockMvc) {
+        this.mapper = mapper;
+        this.mockMvc = mockMvc;
+    }
 
     @MockBean
     ProductService service;
@@ -148,6 +152,7 @@ public class ProductControllerTest {
                 .andExpect( status().isOk() )
                 .andExpect( jsonPath("$.totalElements", is( 4 )) );
     }
+
     @Test
     @DisplayName("Deberia encontrar productos por disponibilidad.")
     void testShouldGetProductByAvailableSuccessfully() throws Exception {
@@ -176,6 +181,7 @@ public class ProductControllerTest {
                 .andExpect( status().isOk() )
                 .andExpect( jsonPath("$.totalElements", is( 2 )) );
     }
+
     @Test
     @DisplayName("Deberia encontrar productos por nombre de categoria.")
     void testShouldGetProductByCategoryNameSuccessfully() throws Exception {
