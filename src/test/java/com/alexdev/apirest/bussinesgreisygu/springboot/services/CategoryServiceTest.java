@@ -20,8 +20,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceTest {
-    List<Category> testCategories;
-    Category testCategory;
+    private List<Category> testCategories;
+    private Category testCategory;
 
     @Mock
     CategoryRepository repository;
@@ -50,7 +50,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Deberia listar todos las categorias.")
-    void testShouldGetAllCategories(){
+    void testShouldGetAllCategoriesSuccessfully(){
         //Arrange
         when( repository.findAll() ).thenReturn( testCategories );
 
@@ -67,7 +67,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Deberia traer una categoria en especifico (por ID).")
-    void testShouldGetCategoryByID(){
+    void testShouldGetCategoryByIDSuccessfully(){
         //Arrange
         Category categoryExpected =testCategories.get(0);
         Long categoryID =testCategories.get(0).getId();
@@ -86,7 +86,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Deberia guardar una nueva categoria.")
-    void testShouldGetCategoryByName(){
+    void testShouldGetCategoryByNameSuccessfully(){
         //Arrange
         CategoryRequest categoryRequest =CategoryRequest.builder().name( testCategory.getName() ).build();
 
@@ -99,35 +99,40 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Deberia actualizar una categoria existente.")
-    void testShouldUpdateAnExistingCategory(){
+    void testShouldUpdateAnExistingCategorySuccessfully(){
         //Arrange
         Category categoryToUpdate =testCategories.get(0);
-        Long categoryID =categoryToUpdate.getId();
-        categoryToUpdate.setName( "Categoria modificada" );
-        CategoryRequest categoryRequest =CategoryRequest.builder().name( categoryToUpdate.getName() ).build();
+        Long categoryToUpdateID =categoryToUpdate.getId();
+        when( repository.findById( categoryToUpdateID ) ).thenReturn(Optional.of( categoryToUpdate ));
 
-        when( repository.findById( categoryID ) ).thenReturn( Optional.of( categoryToUpdate ) );
+        categoryToUpdate.setName( "Categoria mo dificada" );
+        CategoryRequest categoryRequest =CategoryRequest.builder()
+                .name( categoryToUpdate.getName() )
+                .build();
+
+        when( repository.save( categoryToUpdate ) ).thenReturn( categoryToUpdate );
 
         //Act
-        service.update( categoryID ,categoryRequest );
+        service.update( categoryToUpdateID ,categoryRequest );
 
         //Assert
-        verify( repository, times(1) ).findById( anyLong() );
-        verify( repository, times(1) ).save( any() );
+        verify( repository, times(1) ).findById( categoryToUpdateID );
+        verify( repository, times(1) ).save( categoryToUpdate );
     }
 
     @Test
     @DisplayName("Deberia eliminar una categoria existente.")
-    void testShouldDeleteAnExistingCategory(){
+    void testShouldDeleteAnExistingCategorySuccessfully(){
         //Arrange
         Category category =testCategories.get(0);
         Long categoryID =testCategories.get(0).getId();
-        when( repository.findById( categoryID ) ).thenReturn( Optional.of(category ) );
+        when( repository.findById( categoryID ) ).thenReturn( Optional.of( category ) );
+
         //Act
         service.delete( categoryID );
 
         //Assert
         verify( repository, times(1 ) ).findById( anyLong() );
-        verify( repository, times( 1 ) ).delete( any(Category.class) );
+        verify( repository, times( 1 ) ).deleteById( anyLong() );
     }
 }

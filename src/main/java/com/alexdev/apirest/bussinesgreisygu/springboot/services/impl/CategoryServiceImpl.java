@@ -10,16 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository repository;
-    private final ProductRepository productRepository;
 
     @Autowired
-    public CategoryServiceImpl(CategoryRepository repository, ProductRepository productRepository) {
+    public CategoryServiceImpl( CategoryRepository repository ) {
         this.repository = repository;
-        this.productRepository = productRepository;
     }
 
     @Override
@@ -34,10 +33,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void update(Long id, CategoryRequest categoryRequest) {
-        Category categoryToUpdate = findBy( id );
-        categoryToUpdate.setName(categoryRequest.getName());
-
-        repository.save( categoryToUpdate );
+        Optional.of( findBy( id ) )
+            .ifPresent( category -> {
+                category.setName( categoryRequest.getName() );
+                repository.save( category );
+            });
     }
 
     @Override
@@ -53,8 +53,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(Long id) {
-        Category categoryToDelete = findBy( id );
-        repository.delete( categoryToDelete );
+        Optional.of( findBy(id) )
+                .ifPresent( category -> {
+                    repository.deleteById( category.getId() );
+                });
     }
 
 }
