@@ -27,14 +27,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CategoryController.class)
 public class CategoryControllerTest {
-    Category testCategory;
-    List<Category> testCategories;
+    private Category testCategory;
+    private List<Category> testCategories;
+
+    private final ObjectMapper mapper;
+    private final MockMvc mvc;
 
     @Autowired
-    ObjectMapper mapper;
-
-    @Autowired
-    MockMvc mvc;
+    public CategoryControllerTest(ObjectMapper mapper, MockMvc mvc) {
+        this.mapper = mapper;
+        this.mvc = mvc;
+    }
 
     @MockBean
     CategoryService service;
