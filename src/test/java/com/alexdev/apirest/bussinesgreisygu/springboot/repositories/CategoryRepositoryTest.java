@@ -1,7 +1,7 @@
 package com.alexdev.apirest.bussinesgreisygu.springboot.repositories;
 
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Category;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +15,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @DisplayName("Repositorio - Categorias")
 public class CategoryRepositoryTest {
-    static Category testCategory;
-    static List<Category> testCategories;
+    private Category testCategory;
+    private List<Category> testCategories;
+
+    private final CategoryRepository repository;
 
     @Autowired
-    CategoryRepository repository;
+    public CategoryRepositoryTest(CategoryRepository repository) {
+        this.repository = repository;
+    }
 
-
-    @BeforeAll
-    static void init(){
+    @BeforeEach
+    void initEach(){
         testCategory = Category.builder()
                 .name("Lacteos")
                 .build();
@@ -52,7 +55,7 @@ public class CategoryRepositoryTest {
 
         //Assert
         assertNotNull( savedCategories );
-        assertFalse( savedCategories.isEmpty() );
+        assertEquals( testCategories.size() , savedCategories.size() );
     }
 
     @Test
@@ -66,6 +69,7 @@ public class CategoryRepositoryTest {
 
         //Assert
         assertTrue( categoryFound.isPresent() );
+        assertEquals( savedCategory.getId() , categoryFound.get().getId() );
     }
     @Test
     @DisplayName("Deberia traer una categoria en especifico (por nombre).")
