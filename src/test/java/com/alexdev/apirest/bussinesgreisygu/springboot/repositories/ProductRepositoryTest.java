@@ -18,31 +18,21 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @DisplayName("Repositorio - Productos")
 public class ProductRepositoryTest {
-    static Product testProduct;
+    private Product testProduct;
+    private List<Product> testProducts;
+    private Pageable testPageable;
 
-    static List<Category> testCategories;
-    static List<Product> testProductsWithCategories;
-    static List<Product> testProducts;
-    static Pageable testPageable;
-
+    private final ProductRepository repository;
 
     @Autowired
-    ProductRepository repository;
+    public ProductRepositoryTest(ProductRepository repository) {
+        this.repository = repository;
+    }
 
-    @BeforeAll
-    static void init(){
-        testPageable =PageRequest.of(0, 5);
 
-        testCategories = List.of(
-                Category.builder()
-                    .id(1L)
-                    .name("Pastas")
-                    .build(),
-                Category.builder()
-                    .id(2L)
-                    .name("Bebidas")
-                    .build()
-        );
+    @BeforeEach
+    void initEach() {
+        testPageable = PageRequest.of(0, 5);
 
         testProduct = Product.builder()
                 .description("Producto prueba")
@@ -50,50 +40,6 @@ public class ProductRepositoryTest {
                 .img("image.png")
                 .available(true)
                 .build();
-
-
-        testProductsWithCategories = List.of(
-                Product.builder()
-                        .description("Prueba 2")
-                        .price(4321d)
-                        .available(true)
-                        .category(Category.builder()
-                                .id(1L)
-                                .name("Pastas")
-                                .build()
-                        )
-                        .build(),
-                Product.builder()
-                        .description("Prueba 3")
-                        .price(4321d)
-                        .available(false)
-                        .category(Category.builder()
-                                .id(1L)
-                                .name("Pastas")
-                                .build()
-                        )
-                        .build(),
-                Product.builder()
-                        .description("Prueba 4")
-                        .price(7653d)
-                        .available(true)
-                        .category(Category.builder()
-                                .id(2L)
-                                .name("Bebidas")
-                                .build()
-                        )
-                        .build(),
-                Product.builder()
-                        .description("Prueba 5")
-                        .price(7653d)
-                        .available(false)
-                        .category(Category.builder()
-                                .id(2L)
-                                .name("Bebidas")
-                                .build()
-                        )
-                        .build()
-        );
 
         testProducts = List.of(
                 Product.builder()
@@ -126,35 +72,34 @@ public class ProductRepositoryTest {
 
     @Test
     @DisplayName("Deberia listar todos los productos existentes en el sistema.")
-    void testShouldListAllProductsSuccessfully(){
+    void testShouldListAllProductsSuccessfully() {
         //Arrange
-        List<Product> productsToBeSave = testProducts;
-        Integer expectSize =5;
+        repository.saveAll(testProducts);
+        Integer expectSize = 5;
 
         //Act
-        repository.saveAll( productsToBeSave );
         List<Product> savedProducts = repository.findAll();
 
         //Assert
-        assertFalse( savedProducts.isEmpty() );
-        assertEquals( expectSize, savedProducts.size() );
+        assertFalse(savedProducts.isEmpty());
+        assertEquals(expectSize, savedProducts.size());
     }
 
     @Test
     @DisplayName("Deberia guardar correctamente en el sistema")
-    void testShouldBeSaveToDatabaseSuccessfully(){
+    void testShouldBeSaveToDatabaseSuccessfully() {
         //Arrange
         Product productToSave = testProduct;
 
         //Act
-        Product productSaved =repository.save( productToSave );
+        Product productSaved = repository.save(productToSave);
 
         //Assert
         assertNotNull(productSaved.getId());
-        assertEquals( productSaved.getDescription(), productToSave.getDescription() );
-        assertEquals( productSaved.getPrice(), productToSave.getPrice() );
-        assertEquals( productSaved.getImg(), productToSave.getImg() );
-        assertEquals( productSaved.getAvailable(), productToSave.getAvailable() );
+        assertEquals(productSaved.getDescription(), productToSave.getDescription());
+        assertEquals(productSaved.getPrice(), productToSave.getPrice());
+        assertEquals(productSaved.getImg(), productToSave.getImg());
+        assertEquals(productSaved.getAvailable(), productToSave.getAvailable());
     }
 
     @Test
@@ -164,30 +109,32 @@ public class ProductRepositoryTest {
         Product productSaved = repository.save(testProduct);
         String newDescription = "Prueba modificada";
         Double newPrice = 123.67;
+        boolean available = false;
         String newImg = "image.jpg";
 
         //Act
         productSaved.setDescription(newDescription);
         productSaved.setPrice(newPrice);
         productSaved.setImg(newImg);
+        productSaved.setAvailable(available);
         Product productUpdated = repository.save(productSaved);
 
         //Assert
         assertEquals(productUpdated.getId(), productSaved.getId());
-        assertEquals(productUpdated.getDescription(), productSaved.getDescription());
-        assertEquals(productUpdated.getPrice(), productSaved.getPrice());
-        assertEquals(productUpdated.getImg(), productSaved.getImg());
+        assertEquals(newDescription, productUpdated.getDescription());
+        assertEquals(newPrice, productUpdated.getPrice());
+        assertEquals(newImg, productUpdated.getImg());
+        assertEquals(available, productUpdated.getAvailable());
     }
 
     @Test
-    @DisplayName("Deberia encontrar un producto en especifico.")
+    @DisplayName("Deberia encontrar un producto en especifico(por ID).")
     void testShouldFindProductSuccessfully() {
         //Arrange
         Product savedProduct = repository.save(testProduct);
 
         //Act
         Optional<Product> productFound = repository.findById(savedProduct.getId());
-        System.out.println( savedProduct.getId() );
 
         //Assert
         assertFalse(productFound.isEmpty());
@@ -198,11 +145,11 @@ public class ProductRepositoryTest {
     @DisplayName("Deberia eliminar un producto existente correctamente.")
     void testShouldDeleteExistingProductSuccessfully() {
         //Arrange
-        Product savedProduct = repository.save(testProduct);
+        Product productToDelete = repository.save(testProduct);
 
         //Act
-        repository.deleteById(savedProduct.getId());
-        Optional<Product> productFound = repository.findById(savedProduct.getId());
+        repository.deleteById(productToDelete.getId());
+        Optional<Product> productFound = repository.findById(productToDelete.getId());
 
         //Assert
         assertTrue(productFound.isEmpty());
@@ -212,10 +159,110 @@ public class ProductRepositoryTest {
 
     @Nested
     @DisplayName("Productos con categorias")
-    class TestWithDataSQL {
+    @Sql("/sql/products/insert-categories.sql")
+    class ProductAndCategoryTesting {
+        private List<Category> testCategories;
+        private List<Product> testProductsWithCategories;
+
+        @BeforeEach
+        void initEach() {
+            testCategories = List.of(
+                    Category.builder()
+                            .id(1L)
+                            .name("Pastas")
+                            .build(),
+                    Category.builder()
+                            .id(2L)
+                            .name("Bebidas")
+                            .build()
+            );
+
+            testProductsWithCategories = List.of(
+                    Product.builder()
+                            .description("Prueba 2")
+                            .price(4321d)
+                            .available(true)
+                            .category(Category.builder()
+                                    .id(1L)
+                                    .name("Pastas")
+                                    .build()
+                            )
+                            .build(),
+                    Product.builder()
+                            .description("Prueba 3")
+                            .price(4321d)
+                            .available(false)
+                            .category(Category.builder()
+                                    .id(1L)
+                                    .name("Pastas")
+                                    .build()
+                            )
+                            .build(),
+                    Product.builder()
+                            .description("Prueba 4")
+                            .price(7653d)
+                            .available(true)
+                            .category(Category.builder()
+                                    .id(2L)
+                                    .name("Bebidas")
+                                    .build()
+                            )
+                            .build(),
+                    Product.builder()
+                            .description("Prueba 5")
+                            .price(7653d)
+                            .available(false)
+                            .category(Category.builder()
+                                    .id(2L)
+                                    .name("Bebidas")
+                                    .build()
+                            )
+                            .build()
+            );
+
+            repository.saveAll( testProductsWithCategories );
+        }
 
         @Test
-        @Sql(scripts = "/sql/products/insert-categories.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        @DisplayName("Deberia guardar un producto con categoria")
+        void testShouldSaveProductWithCategorySuccessfully() {
+            //Arrange
+            Product product = testProduct;
+            Category category = testCategories.get(0);
+            product.setCategory( category );
+
+            //Act
+            Product savedProduct =repository.save( product );
+
+            //Assert
+            assertNotNull( savedProduct.getId() );
+            assertEquals( product.getCategory().getId(), savedProduct.getCategory().getId() );
+            assertEquals( product.getCategory().getName(), savedProduct.getCategory().getName() );
+        }
+        @Test
+        @DisplayName("Deberia actualizar un producto con categoria existente")
+        void testShouldUpdateAnExistingProductWithCategorySuccessfully() {
+            //Arrange
+            Product productToUpdate = testProductsWithCategories.get(0);
+            Category category = testCategories.get(1);
+
+            productToUpdate.setAvailable( false );
+            productToUpdate.setDescription("Producto modificado");
+            productToUpdate.setCategory( category );
+
+            //Act
+            Product updatedProduct =repository.save( productToUpdate );
+
+            //Assert
+            assertNotNull( updatedProduct.getId() );
+            assertEquals(  productToUpdate.getId(), updatedProduct.getId() );
+            assertEquals( productToUpdate.getDescription(), updatedProduct.getDescription() );
+            assertEquals( productToUpdate.getAvailable(), updatedProduct.getAvailable() );
+            assertEquals( productToUpdate.getCategory().getId(), updatedProduct.getCategory().getId() );
+            assertEquals( productToUpdate.getCategory().getName(), updatedProduct.getCategory().getName() );
+        }
+
+        @Test
         @DisplayName("Deberia filtrar productos por nombre de categoria")
         void testShouldFilterByCategoryName(){
             //Arrange
@@ -223,7 +270,6 @@ public class ProductRepositoryTest {
             Integer expectSizeProducts = 2;
 
             //Act
-            repository.saveAll( testProductsWithCategories );
             Page<Product> productsByCategoryName =repository.findByCategoryName(categoryName, testPageable);
 
             //Assert
@@ -231,7 +277,6 @@ public class ProductRepositoryTest {
         }
 
         @Test
-        @Sql(scripts = "/sql/products/insert-categories.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @DisplayName("Deberia filtrar productos por descripcion")
         void testShouldFilterProductsByDescription(){
             //Arrange
@@ -239,7 +284,6 @@ public class ProductRepositoryTest {
             Integer expectSizeProducts = 4;
 
             //Act
-            repository.saveAll( testProductsWithCategories );
             Page<Product> productsByDescription =repository.findByDescriptionContainingIgnoreCase(description, testPageable);
 
             //Assert
@@ -247,20 +291,15 @@ public class ProductRepositoryTest {
         }
 
         @Test
-        @Sql(scripts = "/sql/products/insert-categories.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @DisplayName("Deberia filtrar productos por disponibilidad")
         void testShouldFilterProductsByAvailable(){
             //Arrange
-            boolean available = true;
             Integer expectSizeProductsIfAvailableTrue = 2;
             Integer expectSizeProductsIfAvailableFalse = 2;
 
             //Act
-            repository.saveAll( testProductsWithCategories );
-            Page<Product> productsByAvailableIfTrue =repository.findByAvailable( available , testPageable);
-            available = false;
-            Page<Product> productsByAvailableIfFalse =repository.findByAvailable( available , testPageable);
-
+            Page<Product> productsByAvailableIfTrue =repository.findByAvailable( true , testPageable);
+            Page<Product> productsByAvailableIfFalse =repository.findByAvailable( false , testPageable);
 
             //Assert
             assertEquals( (int) productsByAvailableIfTrue.getTotalElements(), expectSizeProductsIfAvailableTrue );
@@ -268,7 +307,6 @@ public class ProductRepositoryTest {
         }
 
         @Test
-        @Sql(scripts = "/sql/products/insert-categories.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @DisplayName("Deberia filtrar productos por descripcion, categoria y disponibilidad")
         void testShouldFilterProductsByDescriptionAvailableAndCategory(){
             //Arrange
@@ -278,7 +316,6 @@ public class ProductRepositoryTest {
             Integer expectSizeProducts = 1;
 
             //Act
-            repository.saveAll( testProductsWithCategories );
             Page<Product> testPageDescriptionCategoryAndAvailable =repository.findByDescriptionContainingIgnoreCaseAndCategoryNameAndAvailable(description, categoryName, available ,testPageable);
             categoryName ="Bebidas";
             Page<Product> productsByDescriptionCategoryAndAvailable =repository.findByDescriptionContainingIgnoreCaseAndCategoryNameAndAvailable(description, categoryName, available ,testPageable);
@@ -287,6 +324,7 @@ public class ProductRepositoryTest {
             assertEquals( expectSizeProducts, (int) testPageDescriptionCategoryAndAvailable.getTotalElements());
             assertEquals( expectSizeProducts, (int) productsByDescriptionCategoryAndAvailable.getTotalElements());
         }
+
         @Test
         @Sql(scripts = "/sql/products/insert-categories.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @DisplayName("Deberia filtrar productos por descripcion y categoria")
@@ -297,7 +335,6 @@ public class ProductRepositoryTest {
             Integer expectSizeProducts = 2;
 
             //Act
-            repository.saveAll( testProductsWithCategories );
             Page<Product> testPageDescriptionCategoryAndAvailable =repository.findByDescriptionContainingIgnoreCaseAndCategoryName(description, categoryName ,testPageable);
 
             //Assert
@@ -305,7 +342,6 @@ public class ProductRepositoryTest {
         }
 
         @Test
-        @Sql(scripts = "/sql/products/insert-categories.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @DisplayName("Deberia filtrar productos por descripcion y disponibilidad")
         void testShouldFilterProductsByDescriptionAndAvailable(){
             //Arrange
@@ -314,7 +350,6 @@ public class ProductRepositoryTest {
             Integer expectSizeProducts = 2;
 
             //Act
-            repository.saveAll( testProductsWithCategories );
             Page<Product> testPageDescriptionCategoryAndAvailable =repository.findByDescriptionContainingIgnoreCaseAndAvailable(description, available ,testPageable);
 
             //Assert
@@ -322,7 +357,6 @@ public class ProductRepositoryTest {
         }
 
         @Test
-        @Sql(scripts = "/sql/products/insert-categories.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @DisplayName("Deberia filtrar productos por categoria y disponibilidad")
         void testShouldFilterProductsByCategoryNameAndAvailable(){
             //Arrange
@@ -331,7 +365,6 @@ public class ProductRepositoryTest {
             Integer expectSizeProducts = 1;
 
             //Act
-            repository.saveAll( testProductsWithCategories );
             Page<Product> testPageDescriptionCategoryAndAvailable =repository.findByCategoryNameAndAvailable(categoryName, available ,testPageable);
 
             //Assert
@@ -339,7 +372,6 @@ public class ProductRepositoryTest {
         }
 
         @Test
-        @Sql(scripts = "/sql/products/insert-categories.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @DisplayName("Deberia eliminar todos los productos por una determinada categoria")
         void testShouldDeleteAllProductsByCategoryIdSuccessfully(){
             //Arrange
@@ -350,7 +382,6 @@ public class ProductRepositoryTest {
             Integer expectSizeProducts = 0;
 
             //Act
-            repository.saveAll( testProductsWithCategories );
             repository.deleteAllProductsByCategoryId( category.getId() );
             Page<Product> productsByCategoryName =repository.findByCategoryName( category.getName(), testPageable );
 
