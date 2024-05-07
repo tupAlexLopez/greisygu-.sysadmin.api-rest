@@ -3,9 +3,7 @@ package com.alexdev.apirest.bussinesgreisygu.springboot.controllers;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Category;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.Product;
 import com.alexdev.apirest.bussinesgreisygu.springboot.models.dto.request.ProductRequest;
-import com.alexdev.apirest.bussinesgreisygu.springboot.models.mappers.impl.ProductMapper;
 import com.alexdev.apirest.bussinesgreisygu.springboot.services.ProductService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,8 +45,6 @@ public class ProductControllerTest {
 
     @MockBean
     ProductService service;
-    @MockBean
-    ProductMapper productMapper;
 
     @BeforeEach
     void initEach(){
