@@ -67,17 +67,6 @@ public class ProductController {
         service.deleteAllByCategory( categoryID );
     }
 
-
-    @GetMapping("/category/{name}")
-    public Page<Product> findProductCategoryByName(@PathVariable String name, @PageableDefault(size = 5) Pageable pageable){
-        return service.findByCategoryName( name, pageable );
-    }
-
-    @GetMapping("/available/{available}")
-    public Page<Product> findProductCategoryByName(@PathVariable Boolean available, @PageableDefault(size = 5) Pageable pageable){
-        return service.findByAvailable( available, pageable );
-    }
-
     @GetMapping("/search")
     public Page<Product> buscarPersonas(
             @RequestParam(required = false) String description,
