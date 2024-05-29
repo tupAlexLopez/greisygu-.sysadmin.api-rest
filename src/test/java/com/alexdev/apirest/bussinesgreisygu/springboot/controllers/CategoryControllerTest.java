@@ -32,15 +32,14 @@ public class CategoryControllerTest {
 
     private final ObjectMapper mapper;
     private final MockMvc mvc;
+    @MockBean
+    CategoryService service;
 
     @Autowired
     public CategoryControllerTest(ObjectMapper mapper, MockMvc mvc) {
         this.mapper = mapper;
         this.mvc = mvc;
     }
-
-    @MockBean
-    CategoryService service;
 
     @BeforeEach
     void initEach(){

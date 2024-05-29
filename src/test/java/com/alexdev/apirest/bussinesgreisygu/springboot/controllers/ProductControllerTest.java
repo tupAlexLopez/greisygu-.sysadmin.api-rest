@@ -37,14 +37,14 @@ public class ProductControllerTest {
     private final ObjectMapper mapper;
     private final MockMvc mockMvc;
 
+    @MockBean
+    ProductService service;
+
     @Autowired
     public ProductControllerTest(ObjectMapper mapper, MockMvc mockMvc) {
         this.mapper = mapper;
         this.mockMvc = mockMvc;
     }
-
-    @MockBean
-    ProductService service;
 
     @BeforeEach
     void initEach(){
